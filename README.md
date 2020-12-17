@@ -2,7 +2,8 @@
 A simple python project to inspect your crypto portfolio.
 Might add more functionality later. The data provided by the api is pretty limited.
 
-Currently prints out your 
+Currently prints out your balance and roe
+
 How to run
 
 1. Clone the project
