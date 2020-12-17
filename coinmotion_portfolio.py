@@ -4,11 +4,14 @@ import hmac
 import hashlib
 import requests
 import base64
+import os
 import coinmotion_api as api
+from portfolio_tools import BalanceExcelTool
 import constants
 
 URL_BALANCES = 'https://api.coinmotion.com/v1/balances'
 URL_RATES = 'https://api.coinmotion.com/v2/rates'
+sheetPath = "/Users/henrimakela/Desktop/balances.xls"
 
 #1 Create a nonce. Uses unix timestamp
 nonce = api.createNonce()
@@ -28,6 +31,9 @@ balances = api.requestBalances(payload, headers, URL_BALANCES)
 # Rates are public endpoint
 rates = api.getRates(URL_RATES)
 
+tool = BalanceExcelTool(sheetPath)
+totalDeposits = tool.getTotalDeposits()
+
 ethPrice = float(rates['ethEur']['buy'])
 xrpPrice = float(rates['xrpEur']['buy'])
 
@@ -37,9 +43,16 @@ xrpBalance = float(balances['xrp_bal'])
 ethEur = ethPrice * ethBalance
 xrpEur = xrpPrice * xrpBalance
 
-totalValueInEuros = ethEur + xrpEur
-rates = requests.post
+total = ethEur + xrpEur
+
+profit = total - totalDeposits
+roe = (profit / totalDeposits) * 100
+
 print("Tässä tietoa portfoliostasi: \n\n Omistukset: \n")
 print("ETH: " + str(ethBalance) + "ETH / " + str(ethEur) + " €" )
 print("XRP: " + str(xrpBalance) + "XRP / " + str(xrpEur) + " €" )
-print("Kokonaisarvo fiattina euroina: " + str(totalValueInEuros))
+print("Talletukset: " + str(totalDeposits) + "€") 
+print("Kokonaisarvo: " + str(total) + "€")
+print("Tuotto euroina: " + str(profit))
+print("Tuotto prosentteina: " + '{0:.1f}'.format(roe) + "%")
+
